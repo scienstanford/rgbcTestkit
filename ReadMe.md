@@ -1,4 +1,7 @@
 rgbcTestkit
 -------------------
 
-A repository for holding code related to the high dynamic range imaging capabilities of an RGBC camera from Omnivision.  
+A repository for calibration the RGBC camera testkit from Omnivision.
+
+QT (c) Stanford VISTA Lab
+2015 Oct
