@@ -1,0 +1,31 @@
+function img = rgbcRawRead(filename, sensorsize)
+% Read raw images from RGBC sensor assuming we know the raw image size.
+%
+% This information is set in the ".ovd" file of the Windows software of the
+% RGBC testkit. This software is general for all Omnivision sensors.
+% Therefore, for each specific sensor, the acquisition parameters can be
+% set in the ".ovd" file. Omnivision people can edit this file. 
+%
+% RGBC sensor has high resolution. The ".ovd" file was set to crop the raw
+% images to [3264, 2448] after the acquisition. The raw image size requires
+% high bandwidth and is an issue for RGBC videos.
+% 
+% (c) Stanford VISTA Lab, 2015
+
+if ~strcmpi(filename(end - 3:end),'.raw')
+    error('Filename should end in .raw')
+end
+
+if ~exist('sensorsize','var')
+    sensorsize = [3264, 2448];
+end 
+
+fid = fopen(filename, 'r');
+img = fread(fid, sensorsize);
+fclose(fid); clear fid;
+
+img = img';
+
+disp(['*** Max pixel value is ' num2str(max(img(:))) ' ***']);
+end
+
