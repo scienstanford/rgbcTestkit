@@ -12,13 +12,14 @@
 % Run script s_rgbccfaAlignCheck.m determine how the CFA block should be
 % modified.
 %
-%
-% (c) Stanford VISTA LAB, 2015
+% See also s_rgbcCfaAlignCheck.m
+% 
+% QT (c) Stanford VISTA LAB, 2015
 clear, clc, close all
 
 %%
 fn = '1.4um RGBC QE.xlsx';
-fp = fullfile(rootpath, 'documents', fn);
+fp = fullfile(rgbcrootpath, 'documents', fn);
 
 [num, txt, raw] = xlsread(fp);
 wavelength = num(:, 1);
@@ -36,7 +37,7 @@ plot(wavelength, w, 'k');
 grid on
 xlabel('wavelength (nm)');
 ylabel('sensitivities');
-saveas(gcf, fullfile(rootpath, 'data', 'cfa', 'QE.png'));
+saveas(gcf, fullfile(rgbcrootpath, 'data', 'cfa', 'QE.png'));
 
 name = 'rgbc-omv0';
 comment = 'Original Omnivision RGBC CFA using the provided spectral sensitivities';
@@ -50,17 +51,24 @@ filterOrder = [3, 4, 1, 4, 1, 4, 3, 4;
                4, 3, 4, 1, 4, 1, 4, 3;
                3, 4, 1, 4, 1, 4, 3, 4;
                4, 2, 4, 3, 4, 3, 4, 2];
-save(fullfile(rootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
+save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
 name = 'rgbc-omv1';
-comment = 'Flipped and shifted Omnivision RGBC CFA using the provided spectral sensitivities';
+comment = 'Flipped and shifted Omnivision RGBC CFA for raw images povided by Omnivation';
 data = [r, g, b, w];
 filterNames = {'r', 'g', 'b', 'w'};
 filterOrder = fliplr(filterOrder); % flip
 tmp = repmat(filterOrder, [2, 2]); % replicate twice in row and col
 filterOrder = tmp(5 : 12, 4 : 11); % shift
-save(fullfile(rootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
+save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
-
+name = 'rgbc-omv2';
+comment = 'Flipped and shifted Omnivision RGBC CFA for raw images captured at Stanford';
+data = [r, g, b, w];
+filterNames = {'r', 'g', 'b', 'w'};
+filterOrder = fliplr(filterOrder); % flip
+tmp = repmat(filterOrder, [2, 2]); % replicate twice in row and col
+filterOrder = tmp(3 : 10, 8 : 15); % shift
+save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
 

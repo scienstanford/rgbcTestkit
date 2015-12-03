@@ -4,39 +4,53 @@
 % 
 %
 % 
-% QT (c) Stanford VISTA LAB, 2015
+% (c) Stanford VISTA LAB, 2015
 
 clear, clc, close all
 
 %% Load a raw image
-fn = '8835RGBC-1000lux-D65-color-1x-14ms-30fps.raw';
-fp = fullfile(rootpath, 'data', 'raw', 'omv', fn);
-raw = rgbcrawRead(fp);
+% % Raw images provided by Omnivision
+% Use fliplr=1, rot90=0, rowstart=5, columnstart=4
+% fn = '8835RGBC-1000lux-D65-color-1x-14ms-30fps.raw';
+% fp = fullfile(rgbcrootpath, 'data', 'raw', 'omv', fn);
+% raw = rgbcRawRead(fp);
+
+% Raw images captured using rgbc testkit at Stanford using another ".ovd"
+% file and specifications. These images are stored on scarlet.
+% Use fliplr=1, rot90=0, rowstart=3, columnstart=8
+
+fn = '1310ms_0.raw';
+sltp = 'http://scarlet.stanford.edu/validation/SCIEN/L3'; % scarlet path
+fp = fullfile(sltp, 'rgbc', 'Equad%20path', fn);
+raw = rgbcRawRead(fp, [4224, 3136]);
 
 raw = raw / max(raw(:));
 imagesc(raw)
 axis image
 
 %% Load rgbc cfa
-tmp = load(fullfile(rootpath, 'data', 'cfa', 'rgbc-omv.mat'));
+tmp = load(fullfile(rgbcrootpath, 'data', 'cfa', 'rgbc-omv0.mat'));
 filterNames = tmp.filterNames;
 disp(filterNames);
 filterOrder = tmp.filterOrder; 
 disp(filterOrder);
 
+% Pick one pixel from one repetition CFA block from raw images for each RGB
+% channel
 rgbmask = false([size(filterOrder), 3]);
-rgbmask(4, 6, 1) = true;
-rgbmask(5, 3, 2) = true;
-rgbmask(4, 8, 3) = true;
+rgbmask(1, 3, 1) = true; filterOrder(1, 5)
+rgbmask(2, 2, 2) = true; filterOrder(8, 8)
+rgbmask(1, 1, 3) = true; filterOrder(4, 2)
 
 %% Tile cfa pattern 
-checkp = fullfile(rootpath, 'data', 'render', 'aligncheck');
+checkp = fullfile(rgbcrootpath, 'data', 'render', 'aligncheck');
 mkdir(checkp);
+delete(fullfile(checkp, '*'));
 
-for flipflag = 0 : 1
-    for rotnum = 0 : 3
-        for rrstart = 1 : size(filterOrder, 1)
-            for ccstart = 1 : size(filterOrder, 2)
+for flipflag = 1%0 : 1
+    for rotnum = 0%0 : 3
+        for rrstart = 3%1 : size(filterOrder, 1)
+            for ccstart = 8%1 : size(filterOrder, 2)
                 rgb = zeros([size(raw) ./ size(filterOrder), 3]);
                 for ch = 1 : 3
                     mask = rgbmask(:, :, ch);

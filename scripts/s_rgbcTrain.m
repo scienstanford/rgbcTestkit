@@ -13,7 +13,7 @@ fpCfa = fullfile(rgbcrootpath, 'data', 'cfa');
 fpL3 = fullfile(rgbcrootpath, 'data', 'l3');
 fpCamera = fullfile(rgbcrootpath, 'data', 'camera');
 
-fnCfa = 'rgbc-omv1.mat';
+fnCfa = 'rgbc-omv2.mat';
 fnL3 = ['L3_' fnCfa];
 fnCamera = ['L3camera_' fnCfa];
 
