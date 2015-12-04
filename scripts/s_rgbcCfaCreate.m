@@ -39,24 +39,27 @@ xlabel('wavelength (nm)');
 ylabel('sensitivities');
 saveas(gcf, fullfile(rgbcrootpath, 'data', 'cfa', 'QE.png'));
 
+filterOrder_Origin = [3, 4, 1, 4, 1, 4, 3, 4;
+                      4, 2, 4, 3, 4, 3, 4, 2;
+                      1, 4, 2, 4, 2, 4, 1, 4;
+                      4, 3, 4, 1, 4, 1, 4, 3;
+                      1, 4, 2, 4, 2, 4, 1, 4;
+                      4, 3, 4, 1, 4, 1, 4, 3;
+                      3, 4, 1, 4, 1, 4, 3, 4;
+                      4, 2, 4, 3, 4, 3, 4, 2];
+           
 name = 'rgbc-omv0';
 comment = 'Original Omnivision RGBC CFA using the provided spectral sensitivities';
 data = [r, g, b, w];
 filterNames = {'r', 'g', 'b', 'w'};
-filterOrder = [3, 4, 1, 4, 1, 4, 3, 4;
-               4, 2, 4, 3, 4, 3, 4, 2;
-               1, 4, 2, 4, 2, 4, 1, 4;
-               4, 3, 4, 1, 4, 1, 4, 3;
-               1, 4, 2, 4, 2, 4, 1, 4;
-               4, 3, 4, 1, 4, 1, 4, 3;
-               3, 4, 1, 4, 1, 4, 3, 4;
-               4, 2, 4, 3, 4, 3, 4, 2];
+filterOrder = filterOrder_Origin;
 save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
 name = 'rgbc-omv1';
 comment = 'Flipped and shifted Omnivision RGBC CFA for raw images povided by Omnivation';
 data = [r, g, b, w];
 filterNames = {'r', 'g', 'b', 'w'};
+filterOrder = filterOrder_Origin; % starting from origin
 filterOrder = fliplr(filterOrder); % flip
 tmp = repmat(filterOrder, [2, 2]); % replicate twice in row and col
 filterOrder = tmp(5 : 12, 4 : 11); % shift
@@ -66,6 +69,7 @@ name = 'rgbc-omv2';
 comment = 'Flipped and shifted Omnivision RGBC CFA for raw images captured at Stanford';
 data = [r, g, b, w];
 filterNames = {'r', 'g', 'b', 'w'};
+filterOrder = filterOrder_Origin; % starting from origin
 filterOrder = fliplr(filterOrder); % flip
 tmp = repmat(filterOrder, [2, 2]); % replicate twice in row and col
 filterOrder = tmp(3 : 10, 8 : 15); % shift

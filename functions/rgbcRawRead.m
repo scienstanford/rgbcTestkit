@@ -1,4 +1,4 @@
-function img = rgbcRawRead(filename, sensorsize)
+function img = rgbcRawRead(filepath, sensorsize)
 % Read raw images from RGBC sensor assuming we know the raw image size.
 %
 % For an input URL, download the raw image first onto local directory and
@@ -15,20 +15,19 @@ function img = rgbcRawRead(filename, sensorsize)
 % 
 % (c) Stanford VISTA Lab, 2015
 
-if ~strcmpi(filename(end - 3 : end),'.raw')
+if ~strcmpi(filepath(end - 3 : end),'.raw')
     error('Filename should end in .raw format')
 end
 
-if strcmpi(filename(1 : 4), 'http')
-    urlwrite(filename, 'url.raw'); % download file from URL
-    filename = 'url.raw';
+if strcmpi(filepath(1 : 4), 'http')
+    filepath = urlwrite(filepath, fullfile(rgbcrootpath, 'loadscarlettmpfile.raw')); % download file from URL
 end
 
 if ~exist('sensorsize','var')
     sensorsize = [3264, 2448];
 end 
 
-fid = fopen(filename, 'r');
+fid = fopen(filepath, 'r');
 img = fread(fid, sensorsize);
 fclose(fid); clear fid;
 
@@ -36,8 +35,8 @@ img = img';
 
 disp(['*** Max pixel value is ' num2str(max(img(:))) ' ***']);
 
-if exist('url.raw', 'file') % delete the downloaded raw
-    delete('url.raw');
+if exist(fullfile(rgbcrootpath, 'loadscarlettmpfile.raw'), 'file') % delete the downloaded raw
+    delete(fullfile(rgbcrootpath, 'loadscarlettmpfile.raw'));
 end
 
 end

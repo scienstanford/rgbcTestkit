@@ -19,9 +19,9 @@ clear, clc, close all
 % file and specifications. These images are stored on scarlet.
 % Use fliplr=1, rot90=0, rowstart=3, columnstart=8
 
-fn = '1310ms_0.raw';
+fn = '1000ms_30.raw';
 sltp = 'http://scarlet.stanford.edu/validation/SCIEN/L3'; % scarlet path
-fp = fullfile(sltp, 'rgbc', 'Equad%20path', fn);
+fp = fullfile(sltp, 'rgbc', 'memchu2macbeth', fn);
 raw = rgbcRawRead(fp, [4224, 3136]);
 
 raw = raw / max(raw(:));
@@ -38,9 +38,9 @@ disp(filterOrder);
 % Pick one pixel from one repetition CFA block from raw images for each RGB
 % channel
 rgbmask = false([size(filterOrder), 3]);
-rgbmask(1, 3, 1) = true; filterOrder(1, 5)
-rgbmask(2, 2, 2) = true; filterOrder(8, 8)
-rgbmask(1, 1, 3) = true; filterOrder(4, 2)
+rgbmask(4, 6, 1) = true; filterOrder(4, 6)
+rgbmask(8, 8, 2) = true; filterOrder(8, 8)
+rgbmask(1, 7, 3) = true; filterOrder(1, 7)
 
 %% Tile cfa pattern 
 checkp = fullfile(rgbcrootpath, 'data', 'render', 'aligncheck');
