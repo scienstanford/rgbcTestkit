@@ -5,9 +5,8 @@
 % 
 % Note there might be flip, rotation and shift for the CFA repetition block
 % to align with raw image. This is because the RGBC has high resolution and
-% was set to crop the raw image after the capture. High resolution requires
-% high bandwidth reading raw images from the testkit, which is especially
-% an issue when using the RGBC testkit to capture videos. 
+% was set to crop the raw image after the capture. The cropping is set by
+% the ".ovd" file. See software/ReadMe
 %
 % Run script s_rgbcCfaAlignCheck.m to determine how the CFA block should be
 % flipped and shifted. 

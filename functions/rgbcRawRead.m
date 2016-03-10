@@ -19,12 +19,12 @@ if ~strcmpi(filepath(end - 3 : end),'.raw')
     error('Filename should end in .raw format')
 end
 
-if strcmpi(filepath(1 : 4), 'http')
+if strcmpi(filepath(1 : 4), 'http') % load file from scarlet first
     filepath = urlwrite(filepath, fullfile(rgbcrootpath, 'loadscarlettmpfile.raw')); % download file from URL
 end
 
 if ~exist('sensorsize','var')
-    sensorsize = [3264, 2448];
+    sensorsize = [3264, 2448]; % default sensor size
 end 
 
 fid = fopen(filepath, 'r');
