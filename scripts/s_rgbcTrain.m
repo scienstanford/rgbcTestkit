@@ -4,45 +4,34 @@
 %
 %
 %
-% (c) VISTA Lab, Stanford, 2015 Oct
-clear, clc, close all
-ieInit
+% (c) VISTA Lab, Stanford, 2016 March
 
-%%
-fpCfa = fullfile(rgbcrootpath, 'data', 'cfa');
-fpL3 = fullfile(rgbcrootpath, 'data', 'l3');
-fpCamera = fullfile(rgbcrootpath, 'data', 'camera');
+%% Initialize
+ieInit;
+patchSize = [11 11];
+padSize = (patchSize-1)/2;
 
-fnCfa = 'rgbc-omv2.mat';
-fnL3 = ['L3_' fnCfa];
-fnCamera = ['L3camera_' fnCfa];
+%% Creat camera
+fpCfa = fullfile(rgbcrootpath, 'data', 'cfa', 'rgbc-omv2.mat');
+camera = rgbcCreate(fpCfa);
 
-%% Create and initialize L3 structure
-L3 = L3Initialize();  % use default parameters
+%% L3 Data object
+l3d = l3DataISET;
+l3d.camera = camera;
 
-%% Change CFA
-scenes = L3Get(L3, 'scene');
-wave = sceneGet(scenes{1}, 'wave');   %use the wavelength samples from the first scene
+% Set illuminant properties
+% illuminant levels are the brightness of the scene (cd/m2). If the camera
+% is in auto-exposure mode, the exposure time is determined by the first
+% entry in the illuminantLev list
+l3d.illuminantLev = [70 10 20 30 40 50 60 90];
+l3d.inIlluminantSPD = {'D65'};
+l3d.outIlluminantSPD = {'D65'};
 
-sensorD = L3Get(L3, 'design sensor');
-cfaData = load(fullfile(fpCfa, fnCfa));
-sensorD = sensorSet(sensorD, 'filterspectra', vcReadSpectra(fnCfa,wave));
-sensorD = sensorSet(sensorD, 'filter names', cfaData.filterNames);
-sensorD = sensorSet(sensorD, 'cfa pattern and size', cfaData.filterOrder);
-L3 = L3Set(L3, 'design sensor', sensorD);
-
-L3.training.patchSize = 11;
-
-%% Perform training
-tic
-L3 = L3Train(L3);
-toc
-save(fullfile(fpL3, fnL3), 'L3');
-
-%% Setup and save L3 camera
-L3camera = L3CameraCreate(L3);
-save(fullfile(fpCamera, fnCamera), 'L3camera');
-
+% Training
+l3t = l3TrainRidge();
+l3t.l3c.patchSize = patchSize;
+l3t.l3c.cutPoints = {logspace(-2, -.6, 40), 1/32};
+l3t.train(l3d);
 
 
 
