@@ -77,11 +77,14 @@ filterSpectra = vcReadSpectra(fpCfaData, wave);
 camera = cameraSet(camera, 'sensor filter spectra', filterSpectra);
 
 % CFA structure
-load(fpCfaData,'filterNames');   
+load(fpCfaData, 'filterNames');   
 camera = cameraSet(camera, 'sensor filternames', filterNames);
 
-load(fpCfaData,'filterOrder');   
+load(fpCfaData, 'filterOrder');   
 camera = cameraSet(camera, 'sensor cfa pattern and size', filterOrder);
+
+load(fpCfaData, 'name');   
+camera = cameraSet(camera, 'name', name);
 
 % Pixel substract quantum efficiency is set to 1 because all of the
 % spectral quantum efficiency is grouped into the filter

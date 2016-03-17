@@ -56,7 +56,7 @@ comment = 'Original Omnivision RGBC CFA using the provided spectral sensitivitie
 data = [r, g, b, w];
 filterNames = {'r', 'g', 'b', 'w'};
 filterOrder = filterOrder_Origin;
-save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
+save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'name', 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
 %% CFA1: flipped and shifted repetition block 
 % for example raw images originally provided by OmniVision
@@ -68,7 +68,7 @@ filterOrder = filterOrder_Origin; % starting from origin
 filterOrder = fliplr(filterOrder); % flip
 tmp = repmat(filterOrder, [2, 2]); % replicate twice in row and col
 filterOrder = tmp(5 : 12, 4 : 11); % shift
-save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
+save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'name', 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
 %% CFA1: flipped and shifted repetition block 
 % for example raw images originally captured at Stanford (by Nathan)
@@ -80,6 +80,6 @@ filterOrder = filterOrder_Origin; % starting from origin
 filterOrder = fliplr(filterOrder); % flip
 tmp = repmat(filterOrder, [2, 2]); % replicate twice in row and col
 filterOrder = tmp(3 : 10, 8 : 15); % shift
-save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
+save(fullfile(rgbcrootpath, 'data', 'cfa', name), 'name', 'comment', 'data', 'filterNames', 'filterOrder', 'wavelength');
 
 

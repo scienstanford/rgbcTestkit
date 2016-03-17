@@ -1,84 +1,64 @@
-%% s_rgbcRender.m
+% s_rgbcRender.m
 %
-% This script renders raw image from Omnivision RGBC testkit using L3 and
-% ISET basic pipeline.
-%
+% This scripts renders raw images from OmniVision RGBC testkit. 
 %
 %
-% (c) Stanford Vista Team, 2015 Oct
+% See also s_rgbcTrain.m
+%
+%
+% QT (c) VISTA Lab, Stanford, 2016 March
 
-clear, clc, close all
+%% Initialize
+ieInit;
 
-%% Initialize ISET
-s_initISET
+%% L3
+fpL3 = fullfile(rgbcrootpath, 'data', 'l3', 'L3_rgbc-omv1.mat');
+load(fpL3);
+camera = l3d.get('camera');
+cfa = cameraGet(camera, 'sensor cfa pattern');
 
-%% Render Stanford raw
-% load camera
-fpCamera = fullfile(rgbcrootpath, 'data', 'camera');
-fnCamera = 'L3camera_rgbc-omv2.mat';
+%% Scenes on Scarlet
+dpScarlet = 'http://scarlet.stanford.edu/validation/SCIEN/L3/rgbc';
 
-tmp = load(fullfile(fpCamera, fnCamera));
-camera = tmp.L3camera;
+% for omv example images
+scenes = {'omv'};
+szRaw = [3264, 2448];
 
-% load stanford raw images from scarlet
-scarletpath = 'http://scarlet.stanford.edu/validation/SCIEN/L3/rgbc';
-nameScene = 'memchu3';
-pathRaw = fullfile(scarletpath, nameScene);
-files = lsScarlet(pathRaw, 'raw');
-rawSz = [4224, 3136];
+% % for stanford images
+% szRaw = [4224, 3136];
+% scenes = {'Equad_path', 'HMJ_office_1', 'HMJ_office_2', 'cro_court', 'memchu1', 'memchu1up', ...
+%            'memchu1up2', 'memchu2macbeth', 'memchu3', 'memchudoor', 'quad_arcade', 'quad_arch', ...
+%            'quad_light', 'sap_tower', 'tree_round'};
+       
 
-for ii = 7%1 : length(files)
-    fnRaw = files(ii).name
-    fpRaw = fullfile(pathRaw, fnRaw);
-    
-    % read a raw image
-    raw = rgbcRawRead(fpRaw, rawSz);
-    
-    % pixel value hist
-    rgbcRawHist(raw)
-    offset = 3;
-    
-    raw = raw - offset; % remove offset
-    raw(raw <= 0) = 0;
-    raw = raw / max(raw(:));
-    figure, imagesc(raw), axis image
-    
-    [srgbL3, lrgbL3] = rgbcRender(raw, camera, [nameScene '_' fnRaw]);
+%% Render
+dpRender = fullfile(rgbcrootpath, 'data', 'render');
+
+for ii = 1 : length(scenes)
+    disp(['*****' scenes{ii} '*****']);
+
+    dpRaw = fullfile(dpScarlet, scenes{ii});
+    raws = lsScarlet(dpRaw, 'raw');
+
+    for jj = 1 : length(raws)
+        disp(['**' raws(jj).name '**']);
+
+        fpRaw = fullfile(dpRaw, raws(jj).name);
+        raw = rgbcRawRead(fpRaw, szRaw); % read raw 
+        raw = ieScale(raw, 0, 1/2); % scale raw
+
+        % render
+        l3r = l3Render;
+        l3_xyz = l3r.render(raw, cfa, l3t);
+        [~, l3_lrgb] = xyz2srgb(l3_xyz);
+        l3_lrgb = ieClip(l3_lrgb / quantile(l3_lrgb(:), 0.99),0,1);
+        l3_srgb = lrgb2srgb(l3_lrgb);
+
+        % save
+%         vcNewGraphWin; imshow(l3_srgb);
+        [path, name, ext] = fileparts(fpRaw);
+        fpRender = fullfile(dpRender, [scenes{ii} '_' name '.png']);
+        imwrite(l3_srgb, fpRender);
+    end
 end
-
-
-%% Render OMV raw
-% % load camera
-% fpCamera = fullfile(rgbcrootpath, 'data', 'camera');
-% fnCamera = 'L3camera_rgbc-omv1.mat';
-% 
-% tmp = load(fullfile(fpCamera, fnCamera));
-% camera = tmp.L3camera;
-% 
-% % load omv raw images
-% pathRaw = fullfile(rgbcrootpath, 'data', 'omv');
-% files = dir(fullfile(pathRaw, '*RGBC*raw'));
-% rawSz = [3264, 2448];
-% 
-% for ii = 1 %: length(files)
-%     fnRaw = files(ii).name;
-%     fpRaw = fullfile(pathRaw, fnRaw);
-%     
-%     % read a raw image
-%     raw = rgbcRawRead(fpRaw, rawSz);
-%     
-%     % pixel value hist
-%     rgbcRawHist(raw)
-%     offset = 3;
-%     
-%     raw = raw - offset; % remove offset
-%     raw(raw <= 0) = 0;
-%     raw = raw / max(raw(:));
-%     figure, imagesc(raw), axis image
-%     
-%     [srgbL3, lrgbL3] = rgbcRender(raw, camera, fnRaw);
-% end
-
-
-
 
