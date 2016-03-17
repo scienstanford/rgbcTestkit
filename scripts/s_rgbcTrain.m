@@ -3,7 +3,9 @@
 % This scripts train L3 for Omnivision RGBC testkit. 
 %
 %
+% See also s_rgbcRender.m
 %
+% 
 % QT (c) VISTA Lab, Stanford, 2016 March
 
 %% Initialize
