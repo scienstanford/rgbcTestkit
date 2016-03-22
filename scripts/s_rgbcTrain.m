@@ -14,6 +14,7 @@ ieInit;
 %%
 dpCfa = fullfile(rgbcrootpath, 'data', 'cfa');
 cfas = {'rgbc-omv2.mat', 'rgbc-omv1.mat'};
+patchSize = [11 11];
 
 for ii = 1 : length(cfas)
     %% Create camera
@@ -24,6 +25,7 @@ for ii = 1 : length(cfas)
     %% L3 data
     l3d = l3DataISET;
     l3d.camera = camera;
+    cfapattern = cameraGet(camera, 'sensor cfa pattern'); 
     
     % Set illuminant properties
     % illuminant levels are the brightness of the scene (cd/m2). If the camera
@@ -34,21 +36,24 @@ for ii = 1 : length(cfas)
     l3d.outIlluminantSPD = {'D65'};
     
     %% L3 training
-    tic
     l3t = l3TrainRidge();
-    
-    patchSize = [11 11];
     l3t.l3c.patchSize = patchSize;
 
     vSwing = cameraGet(l3d.camera, 'pixel voltage swing');
-    linearThresholds = logspace(log10(0.01), log10(vSwing * 0.95), 40);
+    linearThresholds = logspace(log10(0.01), log10(vSwing * 0.95), 40); % 0.01 to 0.95*vSwing
     
-    contrast = 1/32;
+    contrast = {[]};
     
     vSat = 0.95 * vSwing;
     satThresholds = {vSat, vSat, vSat, vSat};
+    pixelTypeName = arrayfun(@(x) sprintf('Pixel %d', x), cfapattern, 'UniformOutput', false);    
 
-    l3t.l3c.cutPoints = {linearThresholds, contrast, satThresholds};
+    l3t.l3c.cutPoints = cat(2, linearThresholds, contrast, satThresholds);
+    l3t.l3c.statFunc = {@imagePatchMeanAndContrast, @imagePatchMax};
+    l3t.l3c.statFuncParam = {{}, {}};
+    l3t.l3c.statNames = [{'mean'}, {'contrast'}, pixelTypeName(:)'];
+    
+    tic
     l3t.train(l3d);
     toc
     
